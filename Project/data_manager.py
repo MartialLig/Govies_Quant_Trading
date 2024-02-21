@@ -1,4 +1,5 @@
 import pandas as pd
+import itertools
 
 
 class DataManager():
@@ -8,6 +9,7 @@ class DataManager():
         self.data_by_country = self.generate_country_datasets(self.data)
         self.data_by_maturity = self.generate_maturity_datasets(self.data)
         self.rank_data = self.data.rank(axis=1)
+        self.spread_yield = self.generate_spread_yield_datasets(self.data)
         pass
 
     def set_datetime_index(self, data):
@@ -69,3 +71,26 @@ class DataManager():
             maturity_datasets[maturity] = df[maturity_columns]
 
         return maturity_datasets
+
+    def generate_spread_yield_datasets(self, df):
+        """
+        Calculates the difference between each pair of yield columns in the dataset, creating a new DataFrame.
+
+        This function takes the original DataFrame containing bond yield data and computes the spread between each possible pair of yield columns. The result is a new DataFrame where each column represents the difference (spread) between the yields of two specific bonds.
+
+        Parameters:
+        - df: The original DataFrame containing bond yield data. It is expected to have multiple columns, where each column represents a different bond yield.
+
+        Returns:
+        - A new DataFrame where each column name is a combination of the two original column names involved in the subtraction (e.g., 'BondA-BondB'), and each cell contains the difference between the corresponding yields in the original DataFrame.
+        """
+
+        column_names = df.columns
+        column_pairs = list(itertools.combinations(
+            column_names, 2))  # To create pairs
+
+        df_diff = pd.DataFrame()
+        for colA, colB in column_pairs:
+            column_name = f"{colA}-{colB}"
+            df_diff[column_name] = df[colA] - df[colB]
+        return df_diff
