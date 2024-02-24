@@ -2,7 +2,7 @@ import dash
 from dash import dcc, html
 import plotly.express as px
 import pandas as pd
-from data_manager import DataManager
+from _data_manager import DataManager
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 

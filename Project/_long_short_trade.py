@@ -1,14 +1,40 @@
 import pandas as pd
+from _trade import Trade
 
 
 class TradeLongShort():
     # stratégie qui consiste juste à quand deux indices se croisent, à être long un et short l'autre et
-    def __init__(self, long, short, start_date) -> None:
-        self.long = long
-        self.short = short
+    def __init__(self, long_asset, short_asset, quantity, start_date, end_date) -> None:
         self.start_date = start_date
+        self.end_date = end_date
+        self.long_asset = long_asset
+        self.short_asset = short_asset
+        self.long_trade = Trade(long_asset, quantity, 1,
+                                self.start_date, self.end_date)
+        self.short_trade = Trade(
+            short_asset, quantity, -1, self.start_date, self.end_date)
+        self.p_and_l_data = None
+        self.p_and_l_data_detailed = None
+        self.p_and_l = None
+
         pass
 
+    def daily_Pand_L(self, data):
+        self.long_trade.daily_Pand_L(data)
+        self.short_trade.daily_Pand_L(data)
+        self.p_and_l_data_detailed = pd.merge(
+            self.long_trade.p_and_l_data, self.short_trade.p_and_l_data, left_index=True, right_index=True)
+        self.p_and_l_data_detailed["p_and_l"] = self.p_and_l_data_detailed.iloc[:,
+                                                                                0]+self.p_and_l_data_detailed.iloc[:, 1]
+        new_name = "p_and_l_"+self.long_asset+"-"+self.short_asset
+        self.p_and_l_data = self.p_and_l_data_detailed[[
+            'p_and_l']].rename(columns={'p_and_l': new_name})
+        self.p_and_l = self.p_and_l_data.iloc[-1, 0]
+        return
+
+
+'''
+Old version
     def delta_yield_days_to_hold_range(self, range_day_to_hold, dataset):
         delta_yield_days_list = []
         for business_day_to_hold in range_day_to_hold:
@@ -32,3 +58,4 @@ class TradeLongShort():
         difference = difference_yield_long + difference_yield_short
 
         return difference
+'''
