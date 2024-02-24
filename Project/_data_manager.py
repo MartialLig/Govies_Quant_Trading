@@ -10,6 +10,14 @@ class DataManager():
         self.data_by_maturity = self.generate_maturity_datasets(self.data)
         self.rank_data = self.data.rank(axis=1)
         self.spread_yield = self.generate_spread_yield_datasets(self.data)
+        self.data_mean_by_country = self.aggregate_averages(
+            self.data_by_country)
+        self.data_mean_by_maturity = self.aggregate_averages(
+            self.data_by_maturity)
+        self.data_std_30D_by_country = self.aggregate_rolling_std(
+            self.data_by_country, "30D")
+        self.data_std_30D_by_maturity = self.aggregate_rolling_std(
+            self.data_by_maturity, "30D")
         pass
 
     def set_datetime_index(self, data):
@@ -94,3 +102,31 @@ class DataManager():
             column_name = f"{colA}-{colB}"
             df_diff[column_name] = df[colA] - df[colB]
         return df_diff
+
+    def aggregate_averages(self, datasets):
+        averages_list = []
+
+        for name, df in datasets.items():
+
+            averages = df.mean(axis=1)
+            averages.name = name
+
+            averages_list.append(averages)
+
+        merged_averages_df = pd.concat(averages_list, axis=1)
+
+        return merged_averages_df
+
+    def aggregate_rolling_std(self, datasets, window):
+        std_list = []
+
+        for name, df in datasets.items():
+            rolling_std = df.rolling(window=window).std()
+            rolling_std_mean = rolling_std.mean(axis=1)
+            rolling_std_mean.name = name
+
+            std_list.append(rolling_std_mean)
+
+        merged_std_df = pd.concat(std_list, axis=1)
+
+        return merged_std_df

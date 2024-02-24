@@ -59,6 +59,31 @@ for country, df_country in data_manager.data_by_country.items():
     fig.update_layout(title=dict(x=0.5))  # Center the title
     figures_country.append(dcc.Graph(figure=fig))
 
+figures_others = []
+
+fig = px.line(data_manager.data_mean_by_country, x=data_manager.data_mean_by_country.index, y=data_manager.data_mean_by_country.columns,  # Adjusting column selection
+              title="Average Yield Rates by Country",
+              labels={"value": "Average Yield Rate (%)", "variable": "Country"})
+fig.update_layout(title=dict(x=0.5))
+figures_others.append(dcc.Graph(figure=fig))
+
+fig = px.line(data_manager.data_std_30D_by_country, x=data_manager.data_std_30D_by_country.index, y=data_manager.data_std_30D_by_country.columns,
+              title="30-Day Rolling Standard Deviation of Yield Rates by Country",
+              labels={"value": "Standard Deviation (%)", "variable": "Country"})
+fig.update_layout(title=dict(x=0.5))
+figures_others.append(dcc.Graph(figure=fig))
+
+fig = px.line(data_manager.data_mean_by_maturity, x=data_manager.data_mean_by_maturity.index, y=data_manager.data_mean_by_maturity.columns,  # Adjusting column selection
+              title="Average Yield Rates by Maturity",
+              labels={"value": "Average Yield Rate (%)", "variable": "Maturity"})
+fig.update_layout(title=dict(x=0.5))
+figures_others.append(dcc.Graph(figure=fig))
+
+fig = px.line(data_manager.data_std_30D_by_maturity, x=data_manager.data_std_30D_by_maturity.index, y=data_manager.data_std_30D_by_maturity.columns,
+              title="30-Day Rolling Standard Deviation of Yield Rates by Maturity",
+              labels={"value": "Standard Deviation (%)", "variable": "Maturity"})
+fig.update_layout(title=dict(x=0.5))
+figures_others.append(dcc.Graph(figure=fig))
 
 ########################################################################################################################################################################################################
 ################################################### LAYOUT OF THE DASHBOARD##############################################################################################################################
@@ -78,10 +103,12 @@ app.layout = html.Div([
             'fontWeight': 'bold',  # Rend le texte en gras
         }
     ),
+
     dcc.Tabs(id='tabs', value='tab-1', children=[
         dcc.Tab(label='Everything', value='tab-0'),
         dcc.Tab(label='Maturity Figures', value='tab-1'),
         dcc.Tab(label='Country Figures', value='tab-2'),
+        dcc.Tab(label='Others', value='tab-3'),
     ]),
     html.Div(id='tabs-content')
 ])
@@ -97,18 +124,19 @@ app.layout = html.Div([
 def render_content(tab):
     if tab == 'tab-0':
         return html.Div([
-            # Dynamiquement inclure toutes les figures pour everything
             *figures_everything
         ])
     elif tab == 'tab-1':
         return html.Div([
-            # Dynamiquement inclure toutes les figures pour maturity
             *figures_maturity
         ])
     elif tab == 'tab-2':
         return html.Div([
-            # Dynamiquement inclure toutes les figures pour country
             *figures_country
+        ])
+    elif tab == 'tab-3':
+        return html.Div([
+            *figures_others
         ])
 
 
