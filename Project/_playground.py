@@ -33,5 +33,5 @@ print(trade_long_short.p_and_l)
 list_of_trade = [trade, trade_long_short]
 
 back = Backtest(list_of_trade, data_manager.data)
-data = back.gather_all_trades()
-data.to_clipboard()
+back.gather_all_trades()
+back.p_and_l_detailed_dataset.to_clipboard()

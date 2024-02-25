@@ -35,7 +35,10 @@ class Backtest():
         data['PandL'] = data.sum(axis=1)
         cols = ['PandL'] + [col for col in data.columns if col != 'PandL']
         data = data[cols]
-        return data
+
+        self.p_and_l_detailed_dataset = data
+        self.p_and_l_dataset = data[['PandL']]
+        return
 
     def complete_dataset(self, data):
         """
