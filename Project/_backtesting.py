@@ -1,6 +1,7 @@
 from _trade import Trade
 from _long_short_trade import TradeLongShort
 import pandas as pd
+import plotly.express as px
 
 
 class Backtest():
@@ -91,4 +92,11 @@ class Backtest():
         return
 
     def trades_sorted_by_rentability(self):
+        return
+
+    def plot_p_and_l(self):
+
+        fig = px.line(self.p_and_l_dataset, x=self.p_and_l_dataset.index, y=self.p_and_l_dataset.columns,
+                      title='Profit and Loss Over Time')
+        fig.show()
         return

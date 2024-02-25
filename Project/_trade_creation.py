@@ -11,17 +11,19 @@ class TradeCreationLongShort():
 
     def creation_list_of_trades(self):
         for index, row in self.list_of_orders.iterrows():
-            for col in df.columns:
+            for col in self.list_of_trades.columns:
                 if row[col] !=0:
                     quantity = 1
                     split_world = col.split("-")
-                    if row[col] ==1:
-                        long_asset = 
-                        short_asset =
-                    elif row[col] ==-11:
-                    start_data = 
-                    stop_date = 
-                    trade = TradeLongShort()
+                    if row[col] == 1:
+                        long_asset = split_world[0]
+                        short_asset =split_world[1]
+                    elif row[col] == -1:
+                        long_asset = split_world[1]
+                        short_asset =split_world[0]
+                    start_date = index
+                    stop_date = ??
+                    trade = TradeLongShort(long_asset, short_asset,quantity,start_date,stop_date)
         return 
     
 
