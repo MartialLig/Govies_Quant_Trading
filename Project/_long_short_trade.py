@@ -20,6 +20,14 @@ class TradeLongShort():
         pass
 
     def daily_Pand_L(self, data):
+        """
+        Calculates and updates daily profit and loss for both the long and short trades using market data.
+
+        Parameters:
+            data (DataFrame): The market data used for calculating the profit and loss, indexed by date and containing prices for the assets.
+
+        The method updates the `p_and_l_data`, `p_and_l_data_detailed`, and `p_and_l` attributes with the results of the daily profit and loss calculation.
+        """
         self.long_trade.daily_Pand_L(data)
         self.short_trade.daily_Pand_L(data)
         self.p_and_l_data_detailed = pd.merge(

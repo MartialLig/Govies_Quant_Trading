@@ -10,7 +10,11 @@ from sklearn.preprocessing import StandardScaler
 from _backtesting import Backtest
 from _strategy_linear_regression import StrategyLinearRegression
 from _strategy_linear_regression import StrategyLinearRegression, StrategyLinearRegressionMultiAgent
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, Ridge
+from _trade_filter import TradeFilter
+from sklearn.linear_model import Lasso
+from sklearn.ensemble import RandomForestRegressor
+import xgboost as xgb
 
 
 file_path = "EGB_historical_yield.csv"
@@ -61,9 +65,14 @@ back.plot_p_and_l()
 print("hend")
 '''
 
+
 test2 = StrategyLinearRegressionMultiAgent(
-    "Austria_10y", 5, data_manager.data, 6, 1, LinearRegression(), 5)
+    "Austria_10y", 5, data_manager.data, 6, 1, xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100), 3, -7)
 liste_trades = test2.execution_of_strategy()
+
+trade_filter = TradeFilter(liste_trades, 5)
+liste_trades = trade_filter.filter_by_vol(
+    data_manager.data_std_30D_by_country["Austria"])
 
 back = Backtest(liste_trades, data_manager.data)
 back.gather_all_trades()

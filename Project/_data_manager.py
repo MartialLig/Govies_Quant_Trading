@@ -104,6 +104,15 @@ class DataManager():
         return df_diff
 
     def aggregate_averages(self, datasets):
+        """
+        Aggregates average yields for each dataset, either by country or maturity.
+
+        Parameters:
+            datasets (dict): A dictionary of DataFrames to aggregate.
+
+        Returns:
+            DataFrame: A DataFrame with average yields for each key in the input dictionary.
+        """
         averages_list = []
 
         for name, df in datasets.items():
@@ -118,6 +127,16 @@ class DataManager():
         return merged_averages_df
 
     def aggregate_rolling_std(self, datasets, window):
+        """
+        Computes a rolling standard deviation over a specified window for each dataset, providing insights into volatility.
+
+        Parameters:
+            datasets (dict): A dictionary of DataFrames to compute the rolling standard deviation on.
+            window (str): The window size for the rolling standard deviation, e.g., '30D' for 30 days.
+
+        Returns:
+            DataFrame: A DataFrame with rolling standard deviations for each key in the input dictionary.
+        """
         std_list = []
 
         for name, df in datasets.items():
