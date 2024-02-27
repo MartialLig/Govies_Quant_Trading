@@ -15,6 +15,7 @@ from _trade_filter import TradeFilter
 from sklearn.linear_model import Lasso
 from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
+from _strategy_cross_yield import StrategyCrossYield
 
 
 file_path = "EGB_historical_yield.csv"
@@ -65,14 +66,23 @@ back.plot_p_and_l()
 print("hend")
 '''
 
-
+''' PLAGE GLISSANTE REGRESSION LINEAIRE FONCTIONNE 
 test2 = StrategyLinearRegressionMultiAgent(
-    "Austria_10y", 5, data_manager.data, 6, 1, xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100), 3, -7)
+    "Austria_30y", 5, data_manager.data, 6, 1, xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100), 3, -7)
 liste_trades = test2.execution_of_strategy()
 
 trade_filter = TradeFilter(liste_trades, 5)
 liste_trades = trade_filter.filter_by_vol(
     data_manager.data_std_30D_by_country["Austria"])
+
+back = Backtest(liste_trades, data_manager.data)
+back.gather_all_trades()
+back.plot_p_and_l()
+
+'''
+
+test3 = StrategyCrossYield(data_manager.spread_yield, 3, -5)
+liste_trades = test3.execution_of_strategy()
 
 back = Backtest(liste_trades, data_manager.data)
 back.gather_all_trades()

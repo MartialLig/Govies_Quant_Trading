@@ -7,7 +7,7 @@ class Trade():
         self.long_short = long_short
         self.start_date = start_date
         self.end_date = end_date
-        self.stop_loss = stop_loss  # pas coder
+        self.stop_loss = stop_loss
         self.take_profit = None  # pas coder
         self.p_and_l_data = None
         self.p_and_l = None

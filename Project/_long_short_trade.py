@@ -4,7 +4,7 @@ from _trade import Trade
 
 class TradeLongShort():
     # stratégie qui consiste juste à quand deux indices se croisent, à être long un et short l'autre et
-    def __init__(self, long_asset, short_asset, quantity, start_date, end_date) -> None:
+    def __init__(self, long_asset, short_asset, quantity, start_date, end_date, stop_loss=None) -> None:
         self.start_date = start_date
         self.end_date = end_date
         self.long_asset = long_asset
@@ -16,6 +16,7 @@ class TradeLongShort():
         self.p_and_l_data = None
         self.p_and_l_data_detailed = None
         self.p_and_l = None
+        self.stop_loss = stop_loss
 
         pass
 
@@ -35,6 +36,13 @@ class TradeLongShort():
         self.p_and_l_data_detailed["p_and_l"] = self.p_and_l_data_detailed.iloc[:,
                                                                                 0]+self.p_and_l_data_detailed.iloc[:, 1]
         new_name = "p_and_l_"+self.long_asset+"-"+self.short_asset
+
+        if self.stop_loss != None:
+            for index, row in self.p_and_l_data_detailed.iterrows():
+                if row["p_and_l"] < self.stop_loss:
+                    self.p_and_l_data_detailed = self.p_and_l_data_detailed[
+                        self.p_and_l_data_detailed.index <= index]
+
         self.p_and_l_data = self.p_and_l_data_detailed[[
             'p_and_l']].rename(columns={'p_and_l': new_name})
         self.p_and_l = self.p_and_l_data.iloc[-1, 0]

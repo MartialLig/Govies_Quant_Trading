@@ -7,4 +7,4 @@ from _trade_filter import TradeFilter
 
 
 __all__ = ["DataManager", "Trade", "TradeLongShort",
-           "Backtest", "StrategyLinearRegression", "StrategyLinearRegressionMultiAgent"]
+           "Backtest", "StrategyLinearRegression", "StrategyLinearRegressionMultiAgent", "TradeFilter"]
