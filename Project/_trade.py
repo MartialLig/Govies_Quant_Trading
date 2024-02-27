@@ -11,6 +11,7 @@ class Trade():
         self.take_profit = None  # pas coder
         self.p_and_l_data = None
         self.p_and_l = None
+        self.win_trade = None
         pass
 
     def daily_Pand_L(self, data):
@@ -37,4 +38,5 @@ class Trade():
                     return
         self.p_and_l_data = smaller_dataset[[name_column]]
         self.p_and_l = self.p_and_l_data.iloc[-1, 0]
+        self.win_trade = (self.p_and_l > 0)
         return

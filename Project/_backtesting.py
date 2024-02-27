@@ -2,6 +2,7 @@ from _trade import Trade
 from _long_short_trade import TradeLongShort
 import pandas as pd
 import plotly.express as px
+import numpy as np
 
 
 class Backtest():
@@ -79,31 +80,63 @@ class Backtest():
 
         return data
 
+    def aggregate_results(self):
+        sharp_ratio = self.compute_sharp_ratio()
+        total_return = self.compute_total_return()
+        percentage_win_trade = self.compute_percentage_win_trade()
+        worst_drawdown, date_of_worst_drawdown = self.compute_worst_drawdown()
+        annual_performance = self.performance_by_year()
+
+        results = {
+            "Sharp Ratio": [sharp_ratio],
+            "Total Return": [total_return],
+            "Percentage Win Trade": [percentage_win_trade],
+            "Worst Drawdown": [worst_drawdown],
+            "Date of Worst Drawdown": [date_of_worst_drawdown]
+        }
+
+        results_df = pd.DataFrame(results)
+
+        for year in annual_performance.index:
+            results_df[f'Annual Performance {year}'] = annual_performance.loc[year].values[0]
+
+        return results_df.T
+
     def compute_sharp_ratio(self):
-        return
+        return round(self.p_and_l_dataset["PandL"].diff(
+            1).mean()/self.p_and_l_dataset["PandL"].diff(1).std()*np.sqrt(252), 2)
 
-    def comute_total_return(self):
-        return
-
-    def comute_total_return_annualized(self):
-        return
+    def compute_total_return(self):
+        return self.p_and_l_dataset.iloc[-1, 0]-self.p_and_l_dataset.iloc[0, 0]
 
     def compute_percentage_win_trade(self):
-        return
+        compteur = 0
+        for trade in self.list_of_trades:
+            if trade.win_trade == True:
+                compteur += 1
+        return round(compteur/len(self.list_of_trades), 3)
+
+    def compute_worst_drawdown(self):
+        p_and_l_dataset = self.p_and_l_dataset
+        p_and_l_dataset['max_to_date'] = p_and_l_dataset['PandL'].cummax()
+
+        p_and_l_dataset['drawdown'] = p_and_l_dataset['PandL'] - \
+            p_and_l_dataset['max_to_date']
+
+        worst_drawdown = self.p_and_l_dataset['drawdown'].min()
+        date_of_worst_drawdown = p_and_l_dataset[p_and_l_dataset['drawdown']
+                                                 == worst_drawdown].index[0]
+
+        return worst_drawdown, date_of_worst_drawdown
+
+    def performance_by_year(self):
+        anual_performance = self.p_and_l_dataset.resample(
+            'Y').last() - self.p_and_l_dataset.resample('Y').first()
+        anual_performance.index = anual_performance.index.year
+        return anual_performance
 
     def trades_sorted_by_rentability(self):
         return
-
-    def compute_worst_drawdown(self):
-        # A finir
-        '''self.p_and_l_dataset['max_to_date'] = self.p_and_l_dataset['cum_p_and_l'].cummax()
-
-        self.p_and_l_dataset['drawdown'] = self.p_and_l_dataset['cum_p_and_l'] - self.p_and_l_dataset['max_to_date']
-
-        # Calcul du pire drawdown
-        worst_drawdown = self.p_and_l_dataset['drawdown'].min()'''
-
-        return worst_drawdown
 
     def plot_p_and_l(self, title=None):
         if title == None:

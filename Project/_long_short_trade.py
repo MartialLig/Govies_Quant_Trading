@@ -17,6 +17,7 @@ class TradeLongShort():
         self.p_and_l_data_detailed = None
         self.p_and_l = None
         self.stop_loss = stop_loss
+        self.win_trade = None
 
         pass
 
@@ -46,6 +47,7 @@ class TradeLongShort():
         self.p_and_l_data = self.p_and_l_data_detailed[[
             'p_and_l']].rename(columns={'p_and_l': new_name})
         self.p_and_l = self.p_and_l_data.iloc[-1, 0]
+        self.win_trade = (self.p_and_l > 0)
         return
 
 
