@@ -68,7 +68,7 @@ print("hend")
 
 ''' PLAGE GLISSANTE REGRESSION LINEAIRE FONCTIONNE '''
 test2 = StrategyLinearRegressionMultiAgent(
-    "Austria_30y", 5, data_manager.data, 6, 1, xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100), 3, -7)
+    "Belgium_10y", 5, data_manager.data, 6, 1, xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100), 3, -7)
 liste_trades = test2.execution_of_strategy()
 
 trade_filter = TradeFilter(liste_trades, 5)
@@ -79,7 +79,7 @@ back = Backtest(liste_trades, data_manager.data)
 back.gather_all_trades()
 back.plot_p_and_l()
 
-
+"""
 stop_loss = 0
 test3 = StrategyCrossYield(data_manager.spread_yield, 3, stop_loss)
 liste_trades = test3.execution_of_strategy()
@@ -113,3 +113,4 @@ liste_trades = test3.execution_of_strategy()
 back = Backtest(liste_trades, data_manager.data)
 back.gather_all_trades()
 back.plot_p_and_l()
+"""

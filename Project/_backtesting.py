@@ -85,12 +85,14 @@ class Backtest():
         total_return = self.compute_total_return()
         percentage_win_trade = self.compute_percentage_win_trade()
         worst_drawdown, date_of_worst_drawdown = self.compute_worst_drawdown()
+        number_of_trade = self.number_of_trade()
         annual_performance = self.performance_by_year()
 
         results = {
             "Sharp Ratio": [sharp_ratio],
             "Total Return": [total_return],
             "Percentage Win Trade": [percentage_win_trade],
+            "Number of Trades": [number_of_trade],
             "Worst Drawdown": [worst_drawdown],
             "Date of Worst Drawdown": [date_of_worst_drawdown]
         }
@@ -134,6 +136,9 @@ class Backtest():
             'Y').last() - self.p_and_l_dataset.resample('Y').first()
         anual_performance.index = anual_performance.index.year
         return anual_performance
+
+    def number_of_trade(self):
+        return len(self.list_of_trades)
 
     def trades_sorted_by_rentability(self):
         return

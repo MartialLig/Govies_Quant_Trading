@@ -127,49 +127,6 @@ class OptimisationTimeRegressison():
 
         return train_set, test_set
 
-        '''    def run_regression_and_focus(self, dataset,train_duration, test_duration,  target_column):
-
-
-        liste_data = self.create_all_datasets(
-                dataset, train_duration, test_duration)
-        metrics = []
-
-        for train_set, test_set in liste_data:
-            X_train = train_set.drop(columns=[target_column])
-            y_train = train_set[target_column]
-            X_test = test_set.drop(columns=[target_column])
-            y_test = test_set[target_column]
-
-            model = LinearRegression()
-            model.fit(X_train, y_train)
-
-            # Predictions for the training set
-            train_predictions = model.predict(X_train)
-            train_r2 = r2_score(y_train, train_predictions)
-            train_rmse = np.sqrt(mean_squared_error(
-                y_train, train_predictions))
-            train_mae = mean_absolute_error(
-                y_train, train_predictions)  # MAE for the training set
-
-            # Predictions for the test set
-            test_predictions = model.predict(X_test)
-            test_r2 = r2_score(y_test, test_predictions)
-            test_rmse = np.sqrt(mean_squared_error(y_test, test_predictions))
-            test_mae = mean_absolute_error(y_test, test_predictions)
-
-            metrics.append({
-                'Train_R2': train_r2,
-                'Train_RMSE': train_rmse,
-                'Train_MAE': train_mae,
-                'Test_R2': test_r2,
-                'Test_RMSE': test_rmse,
-                'Test_MAE': test_mae,
-                'start_date_test': test_set.index[-1]
-            })
-        metrics_df = pd.DataFrame(metrics)
-
-        return metrics_df'''
-
     def run_regression_and_focus(self, dataset, train_duration, test_duration, target_column):
         liste_data = self.create_all_datasets(
             dataset, train_duration, test_duration)
@@ -239,3 +196,48 @@ class OptimisationTimeRegressison():
 
         metrics_df = pd.DataFrame(metrics)
         return metrics_df
+
+
+class AssetSelectioByModel:
+    def __init__(self, data, start_date, end_date, model):
+        self.data = data
+        self.start_date = start_date
+        self.end_date = end_date
+        self.model = model
+        self.results_df = None
+        self.df = None
+
+    def preprocess_data(self):
+        new_data = self.data.diff(5)
+        new_data = new_data.dropna(axis=0)
+        self.df = new_data[(new_data.index >= self.start_date)
+                           & (new_data.index < self.end_date)]
+
+    def train_and_evaluate(self):
+        if self.df is None:
+            self.preprocess_data()
+
+        model = self.model
+        results = []
+
+        for column in self.df.columns:
+            y = self.df[column].shift(-5)
+            X = self.df.drop(columns=[column]).iloc[:-5]
+            y = y.dropna()
+            y.to_numpy()
+            X.to_numpy()
+            if not X.empty and len(X) == len(y):
+                model.fit(X, y)
+                predictions = model.predict(X)
+                mse = mean_squared_error(y, predictions)
+                rmse = np.sqrt(mse)
+                result = {
+                    'column': column,
+                    'score': model.score(X, y),
+                    'MSE': mse,
+                    'RMSE': rmse
+                }
+                results.append(result)
+
+        self.results_df = pd.DataFrame(results)
+        return self.results_df.sort_values("score", ascending=False)
