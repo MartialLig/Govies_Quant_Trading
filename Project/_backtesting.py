@@ -94,9 +94,23 @@ class Backtest():
     def trades_sorted_by_rentability(self):
         return
 
-    def plot_p_and_l(self):
+    def compute_worst_drawdown(self):
+        # A finir
+        '''self.p_and_l_dataset['max_to_date'] = self.p_and_l_dataset['cum_p_and_l'].cummax()
+
+        self.p_and_l_dataset['drawdown'] = self.p_and_l_dataset['cum_p_and_l'] - self.p_and_l_dataset['max_to_date']
+
+        # Calcul du pire drawdown
+        worst_drawdown = self.p_and_l_dataset['drawdown'].min()'''
+
+        return worst_drawdown
+
+    def plot_p_and_l(self, title=None):
+        if title == None:
+            title = 'Profit and Loss Over Time'
 
         fig = px.line(self.p_and_l_dataset, x=self.p_and_l_dataset.index, y=self.p_and_l_dataset.columns,
-                      title='Profit and Loss Over Time')
+                      title=title)
+        fig.update_layout(title_text=title, title_x=0.5)
         fig.show()
         return

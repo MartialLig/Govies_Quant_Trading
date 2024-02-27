@@ -80,8 +80,34 @@ back.gather_all_trades()
 back.plot_p_and_l()
 
 '''
+stop_loss = 0
+test3 = StrategyCrossYield(data_manager.spread_yield, 3, stop_loss)
+liste_trades = test3.execution_of_strategy()
 
-test3 = StrategyCrossYield(data_manager.spread_yield, 3, -5)
+back = Backtest(liste_trades, data_manager.data)
+back.gather_all_trades()
+back.plot_p_and_l()
+
+stop_loss = 0
+test3 = StrategyCrossYield(data_manager.spread_yield, 5, stop_loss)
+liste_trades = test3.execution_of_strategy()
+
+back = Backtest(liste_trades, data_manager.data)
+back.gather_all_trades()
+back.plot_p_and_l()
+
+
+stop_loss = 0
+test3 = StrategyCrossYield(data_manager.spread_yield, 10, stop_loss)
+liste_trades = test3.execution_of_strategy()
+
+back = Backtest(liste_trades, data_manager.data)
+back.gather_all_trades()
+back.plot_p_and_l()
+
+
+stop_loss = 0
+test3 = StrategyCrossYield(data_manager.spread_yield, 20, stop_loss)
 liste_trades = test3.execution_of_strategy()
 
 back = Backtest(liste_trades, data_manager.data)

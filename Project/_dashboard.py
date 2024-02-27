@@ -32,12 +32,12 @@ fig = px.line(data_manager.rank_data, x=data_manager.rank_data.index, y=data_man
 fig.update_layout(title=dict(x=0.5))
 fig.update_traces(line=dict(width=1))
 figures_everything.append(dcc.Graph(figure=fig))
-fig = px.line(data_manager.spread_yield, x=data_manager.spread_yield.index, y=data_manager.spread_yield.columns,  # Adjusting column selection
+'''fig = px.line(data_manager.spread_yield, x=data_manager.spread_yield.index, y=data_manager.spread_yield.columns,  # Adjusting column selection
               title=f"Yield Spread",
               labels={"value": "Yield Spread Rate", "variable": "Country"})
 fig.update_layout(title=dict(x=0.5))
 fig.update_traces(line=dict(width=1))
-figures_everything.append(dcc.Graph(figure=fig))
+figures_everything.append(dcc.Graph(figure=fig))'''
 
 
 figures_maturity = []
