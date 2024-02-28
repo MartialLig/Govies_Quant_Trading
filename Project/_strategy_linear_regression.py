@@ -10,18 +10,20 @@ from sklearn.preprocessing import StandardScaler
 
 
 class StrategyLinearRegressionMultiAgent:
-    def __init__(self, asset, dif_time, data, train_duration, test_duration, model, thresold, stop_loss=None, z_score_transformation=None) -> None:
+    def __init__(self, asset, dif_time, data, train_duration, test_duration, model, thresold, stop_loss=None, z_score_transformation=None, end_date=pd.to_datetime("2023-07-01")) -> None:
         self.asset = asset
         self.dif_time = dif_time
         self.data = self.data_preparation_for_execution(data)
         self.train_duration = train_duration
         self.test_duration = test_duration
+        self.end_date = end_date
         self.datasets = self.create_all_datasets(
             self.data, self.train_duration, self.test_duration)
         self.model = model
         self.thresold = thresold
         self.stop_loss = stop_loss
         self.z_score_transformation = z_score_transformation
+
         pass
 
     def create_all_datasets(self, df, train_duration, test_duration):
@@ -38,7 +40,7 @@ class StrategyLinearRegressionMultiAgent:
         """
         limit_date = df.index[0]
         list_of_datasets = []
-        while limit_date < pd.to_datetime("2023-07-01"):
+        while limit_date < self.end_date:
             train, test = self.train_test_split_time_series(
                 df, train_duration, test_duration)
 

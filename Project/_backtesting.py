@@ -136,7 +136,7 @@ class Backtest():
         p_and_l_dataset['drawdown'] = p_and_l_dataset['PandL'] - \
             p_and_l_dataset['max_to_date']
 
-        worst_drawdown = self.p_and_l_dataset['drawdown'].min()
+        worst_drawdown = p_and_l_dataset['drawdown'].min()
         date_of_worst_drawdown = p_and_l_dataset[p_and_l_dataset['drawdown']
                                                  == worst_drawdown].index[0]
 
@@ -158,7 +158,7 @@ class Backtest():
         if title == None:
             title = 'Profit and Loss Over Time'
 
-        fig = px.line(self.p_and_l_dataset, x=self.p_and_l_dataset.index, y=self.p_and_l_dataset.columns,
+        fig = px.line(self.p_and_l_dataset, x=self.p_and_l_dataset.index, y="PandL",
                       title=title)
         fig.update_layout(title_text=title, title_x=0.5)
         fig.show()
