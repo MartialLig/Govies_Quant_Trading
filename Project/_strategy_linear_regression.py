@@ -6,10 +6,11 @@ from _trade import Trade
 from _long_short_trade import TradeLongShort
 import pandas as pd
 from sklearn.linear_model import Ridge
+from sklearn.preprocessing import StandardScaler
 
 
 class StrategyLinearRegressionMultiAgent:
-    def __init__(self, asset, dif_time, data, train_duration, test_duration, model, thresold, stop_loss=None) -> None:
+    def __init__(self, asset, dif_time, data, train_duration, test_duration, model, thresold, stop_loss=None, z_score_transformation=None) -> None:
         self.asset = asset
         self.dif_time = dif_time
         self.data = self.data_preparation_for_execution(data)
@@ -20,6 +21,7 @@ class StrategyLinearRegressionMultiAgent:
         self.model = model
         self.thresold = thresold
         self.stop_loss = stop_loss
+        self.z_score_transformation = z_score_transformation
         pass
 
     def create_all_datasets(self, df, train_duration, test_duration):
@@ -51,7 +53,7 @@ class StrategyLinearRegressionMultiAgent:
     def train_test_split_time_series(self, df, train_duration, test_duration):
 
         end_train_date = df.index[0] + pd.DateOffset(months=train_duration)
-        print(end_train_date)
+        # print(end_train_date)
 
         start_test_date = end_train_date
 
@@ -94,7 +96,7 @@ class StrategyLinearRegressionMultiAgent:
 
             test_set.drop(["y"], axis=1, inplace=True)
             strategy = StrategyLinearRegression(
-                self.asset, self.dif_time, train_set, y_train, test_set, self.model, self.data.index, self.stop_loss)
+                self.asset, self.dif_time, train_set, y_train, test_set, self.model, self.data.index, self.stop_loss, self.z_score_transformation)
             strategy.train()
             list_of_trades += strategy.trade_creation(-self.thresold,
                                                       self.thresold)
@@ -103,7 +105,7 @@ class StrategyLinearRegressionMultiAgent:
 
 class StrategyLinearRegression:
 
-    def __init__(self, asset, dif_time, data_train, y_train, data_trade, model, index_all, stop_loss=None) -> None:
+    def __init__(self, asset, dif_time, data_train, y_train, data_trade, model, index_all, stop_loss=None, z_score_transformation=None) -> None:
         # La data est deja clean (avec les diff, les shift, les dropna)
 
         self.asset = asset
@@ -112,23 +114,10 @@ class StrategyLinearRegression:
         self.y_train = y_train
         self.data_trade = data_trade
 
-        '''self.data_train = data_train.diff(self.dif_time)
-        self.data_trade = data_trade.diff(self.dif_time)
-        self.data_train = self.data_train.dropna(axis=0)
-        self.data_trade = self.data_trade.dropna(axis=0)
-
-        self.y_train = self.data_train[self.asset].shift(-self.dif_time)
-        self.X_train = self.data_train.drop(
-            columns=[self.asset]).iloc[:-self.dif_time]
-        self.y_train = self.y_train.dropna()
-
-        # self.y_trade = self.data_trade[self.asset].shift(-self.dif_time)
-        self.X_trade = self.data_trade.drop(
-            columns=[self.asset]).iloc[:-self.dif_time]'''
-
         self.model = model
         self.index_all = index_all
         self.stop_loss = stop_loss
+        self.z_score_transformation = z_score_transformation
 
         return
 
@@ -136,13 +125,19 @@ class StrategyLinearRegression:
         """
         Trains the regression model on the provided training data and targets.
         """
+        if self.z_score_transformation != None:
+            scaler = StandardScaler()
 
-        if self.data_train.shape[0] == self.y_train.shape[0]:
-            self.model.fit(self.data_train, self.y_train)
+            data_train_scaled = scaler.fit_transform(self.data_train)
+            self.data_train = pd.DataFrame(
+                data_train_scaled, columns=self.data_train.columns, index=self.data_train.index)
 
-            '''predictions = self.model.predict(X)
-            mse = mean_squared_error(self.y_train, predictions)  
-            rmse = np.sqrt(mse)  '''
+            data_trade_scaled = scaler.transform(self.data_trade)
+            self.data_trade = pd.DataFrame(
+                data_trade_scaled, columns=self.data_trade.columns, index=self.data_trade.index)
+
+        self.model.fit(self.data_train, self.y_train)
+
         return
 
     def trade_creation(self, trhesold_long, trhesold_short):

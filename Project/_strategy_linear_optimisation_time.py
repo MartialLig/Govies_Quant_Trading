@@ -115,7 +115,7 @@ class OptimisationTimeRegressison():
     def train_test_split_time_series(self, df, train_duration, test_duration):
 
         end_train_date = df.index[0] + pd.DateOffset(months=train_duration)
-        print(end_train_date)
+        # print(end_train_date)
 
         start_test_date = end_train_date
 

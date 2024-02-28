@@ -80,6 +80,17 @@ class Backtest():
 
         return data
 
+    def data_with_adjusted_index(self):
+        start_index = self.p_and_l_dataset[self.p_and_l_dataset["PandL"] != 0].first_valid_index(
+        )
+
+        diff = self.p_and_l_dataset["PandL"] .diff().ne(0)
+        end_index = diff[diff].last_valid_index()
+
+        self.p_and_l_dataset = self.p_and_l_dataset.loc[start_index:end_index]
+
+        return
+
     def aggregate_results(self):
         sharp_ratio = self.compute_sharp_ratio()
         total_return = self.compute_total_return()
