@@ -47,11 +47,6 @@ data_manager.data.std(axis=0).sort_values()
 
 corr = data_manager.data.corr()
 
-plt.figure(figsize=(25, 10))
-sns.heatmap(corr, annot=True, cmap='coolwarm', cbar=True,
-            square=True, fmt='.2f', annot_kws={'size': 10})
-plt.title('Matrice de Corrélation')
-plt.show()
 
 data_spread_yield = data_manager.spread_yield
 time_to_keep_the_asset_if_not_cross = [5, 10, 20, 40, 60, 80]
