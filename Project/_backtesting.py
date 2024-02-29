@@ -81,6 +81,10 @@ class Backtest():
         return data
 
     def data_with_adjusted_index(self):
+        """
+        Adjusts the index of the profit and loss dataset to only include the period where trades are active,
+        removing the leading and trailing zeros in the profit and loss series.
+        """
         start_index = self.p_and_l_dataset[self.p_and_l_dataset["PandL"] != 0].first_valid_index(
         )
 
@@ -92,6 +96,13 @@ class Backtest():
         return
 
     def aggregate_results(self):
+        """
+        Aggregates and computes key performance metrics from the backtested trades, including Sharpe ratio,
+        total return, percentage of winning trades, worst drawdown, and annual performance.
+
+        Returns:
+            DataFrame: A transposed DataFrame containing the calculated performance metrics.
+        """
         sharp_ratio = self.compute_sharp_ratio()
         total_return = self.compute_total_return()
         percentage_win_trade = self.compute_percentage_win_trade()
@@ -116,13 +127,31 @@ class Backtest():
         return results_df.T
 
     def compute_sharp_ratio(self):
+        """
+        Computes the Sharpe ratio of the backtested trades, based on the daily profit and loss.
+
+        Returns:
+            float: The Sharpe ratio rounded to two decimal places.
+        """
         return round(self.p_and_l_dataset["PandL"].diff(
             1).mean()/self.p_and_l_dataset["PandL"].diff(1).std()*np.sqrt(252), 2)
 
     def compute_total_return(self):
+        """
+        Computes the total return from the backtested trades.
+
+        Returns:
+            float: The total return.
+        """
         return self.p_and_l_dataset.iloc[-1, 0]-self.p_and_l_dataset.iloc[0, 0]
 
     def compute_percentage_win_trade(self):
+        """
+        Computes the percentage of winning trades from the list of backtested trades.
+
+        Returns:
+            float: The percentage of winning trades, rounded to three decimal places.
+        """
         compteur = 0
         for trade in self.list_of_trades:
             if trade.win_trade == True:
@@ -130,6 +159,12 @@ class Backtest():
         return round(compteur/len(self.list_of_trades), 3)
 
     def compute_worst_drawdown(self):
+        """
+        Identifies the worst drawdown from the backtested trades.
+
+        Returns:
+            tuple: A tuple containing the value of the worst drawdown and the date it occurred.
+        """
         p_and_l_dataset = self.p_and_l_dataset
         p_and_l_dataset['max_to_date'] = p_and_l_dataset['PandL'].cummax()
 
@@ -143,18 +178,36 @@ class Backtest():
         return worst_drawdown, date_of_worst_drawdown
 
     def performance_by_year(self):
+        """
+        Calculates the annual performance from the backtested trades.
+
+        Returns:
+            DataFrame: A DataFrame with annual performance, indexed by year.
+        """
         anual_performance = self.p_and_l_dataset.resample(
             'Y').last() - self.p_and_l_dataset.resample('Y').first()
         anual_performance.index = anual_performance.index.year
         return anual_performance
 
     def number_of_trade(self):
+        """
+        Counts the total number of trades within the list of backtested trades.
+
+        Returns:
+            int: The total number of trades.
+        """
         return len(self.list_of_trades)
 
     def trades_sorted_by_rentability(self):
         return
 
     def plot_p_and_l(self, title=None):
+        """
+        Plots the profit and loss over time using the Plotly library.
+
+        Parameters:
+            title (str, optional): The title of the plot. If None, a default title 'Profit and Loss Over Time' is used.
+        """
         if title == None:
             title = 'Profit and Loss Over Time'
 

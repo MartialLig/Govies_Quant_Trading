@@ -1,3 +1,4 @@
+import nbformat
 import pandas as pd
 from _data_manager import DataManager
 from _trade import Trade
@@ -114,3 +115,23 @@ back = Backtest(liste_trades, data_manager.data)
 back.gather_all_trades()
 back.plot_p_and_l()
 """
+
+
+notebook_path = 'compte_rendu.ipynb'
+with open(notebook_path, 'r', encoding='utf-8') as nb_file:
+    nb_content = nbformat.read(nb_file, as_version=4)
+
+code_blocks = []
+for cell in nb_content['cells']:
+    if cell['cell_type'] == 'code':
+        code_blocks.append(cell['source'])
+
+all_code = '\n\n'.join(code_blocks)
+
+print(all_code)
+
+code_file_path = '_compte_rendu.py'
+with open(code_file_path, 'w', encoding='utf-8') as code_file:
+    code_file.write(all_code)
+
+code_file_path

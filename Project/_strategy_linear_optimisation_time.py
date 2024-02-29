@@ -14,6 +14,19 @@ class OptimisationTimeRegressison():
         pass
 
     def find_optimal_value(self, dataset, set_time_to_compare, target_column):
+        """
+        Identifies optimal training and testing durations for linear regression modeling,
+        based on a given set of training and testing duration pairs.
+
+        Parameters:
+            dataset (DataFrame): The dataset to be used.
+            set_time_to_compare (set of tuples): A set of tuples defining training and testing durations to compare.
+            target_column (str): The name of the target column for prediction.
+
+        Returns:
+            tuple: A tuple containing a DataFrame with quick results and a dictionary with detailed results.
+        """
+
         results_detailed = {}
         quick_results_data = []
         for train_duration, test_duration in set_time_to_compare:
@@ -23,21 +36,17 @@ class OptimisationTimeRegressison():
                 liste_data, target_column)
             results_detailed[(train_duration, test_duration)] = result_summary
 
-            # Filter the DataFrame for positive and negative R2 Test values separately
             positive_r2_test = result_summary[result_summary["Test_R2"]
                                               > 0]["Test_R2"]
             negative_r2_test = result_summary[result_summary["Test_R2"]
                                               < 0]["Test_R2"]
 
-            # Calculate the mean for both positive and negative R2 Test values
             mean_positive_r2_test = positive_r2_test.mean()
             mean_negative_r2_test = negative_r2_test.mean()
 
-            # Drop 'start_date_test' column if it exists and calculate the mean for other columns
             mean_values = result_summary.drop(
                 columns=['start_date_test'], errors='ignore').mean().to_dict()
 
-            # Add the mean positive and negative R2 Test values to the mean_values dictionary
             mean_values['mean_positive_r2_test'] = mean_positive_r2_test
             mean_values['mean_negative_r2_test'] = mean_negative_r2_test
 
@@ -57,6 +66,16 @@ class OptimisationTimeRegressison():
         return quick_results, results_detailed
 
     def run_regressions_and_save_metrics(self, list_of_datasets,  target_column):
+        """
+        Runs linear regressions on a list of training and testing dataset pairs, saving performance metrics.
+
+        Parameters:
+            list_of_datasets (list of tuples): A list of tuples of DataFrames (train_set, test_set).
+            target_column (str): The name of the target column for prediction.
+
+        Returns:
+            DataFrame: A DataFrame containing performance metrics for each training and testing set pair.
+        """
 
         metrics = []
 
@@ -97,6 +116,17 @@ class OptimisationTimeRegressison():
         return metrics_df
 
     def create_all_datasets(self, df, train_duration, test_duration):
+        """
+        Creates all training and testing dataset pairs from a DataFrame based on training and testing durations.
+
+        Parameters:
+            df (DataFrame): The initial dataset.
+            train_duration (int): Training duration in months.
+            test_duration (int): Testing duration in months.
+
+        Returns:
+            list: A list of DataFrame pairs (train_set, test_set) for each period.
+        """
         limit_date = df.index[0]
         list_of_datasets = []
         while limit_date < pd.to_datetime("2019-07-01"):
@@ -113,6 +143,17 @@ class OptimisationTimeRegressison():
         return list_of_datasets
 
     def train_test_split_time_series(self, df, train_duration, test_duration):
+        """
+        Splits a DataFrame into training and testing sets based on specific durations, for a time series.
+
+        Parameters:
+            df (DataFrame): The time series data DataFrame.
+            train_duration (int): Training duration in months.
+            test_duration (int): Testing duration in months.
+
+        Returns:
+            tuple: A tuple containing the training and testing DataFrames.
+        """
 
         end_train_date = df.index[0] + pd.DateOffset(months=train_duration)
         # print(end_train_date)
@@ -128,12 +169,23 @@ class OptimisationTimeRegressison():
         return train_set, test_set
 
     def run_regression_and_focus(self, dataset, train_duration, test_duration, target_column):
+        """
+        Executes a  regression on dataset pairs created for specific training and testing durations,
+        focusing on detailed error analysis, plot of graphs.
+
+        Parameters:
+            dataset (DataFrame): The dataset to be used.
+            train_duration (int): Training duration in months.
+            test_duration (int): Testing duration in months.
+            target_column (str): The name of the target column for prediction.
+
+        Returns:
+            DataFrame: A DataFrame containing performance metrics for each training and testing set pair.
+        """
         liste_data = self.create_all_datasets(
             dataset, train_duration, test_duration)
         metrics = []
 
-        # Prepare the figure layout for plotting
-        # Doubling the number of plots to accommodate error plots
         fig, axs = plt.subplots(len(liste_data)*4, 1,
                                 figsize=(10, len(liste_data)*16))
         fig.subplots_adjust(hspace=0.5)
@@ -147,20 +199,17 @@ class OptimisationTimeRegressison():
             model = Ridge()
             model.fit(X_train, y_train)
 
-            # Predictions for the training set
             train_predictions = model.predict(X_train)
             train_r2 = r2_score(y_train, train_predictions)
             train_rmse = np.sqrt(mean_squared_error(
                 y_train, train_predictions))
             train_mae = mean_absolute_error(y_train, train_predictions)
 
-            # Predictions for the test set
             test_predictions = model.predict(X_test)
             test_r2 = r2_score(y_test, test_predictions)
             test_rmse = np.sqrt(mean_squared_error(y_test, test_predictions))
             test_mae = mean_absolute_error(y_test, test_predictions)
 
-            # Assuming the index is datetime
             start_date_test = test_set.index[0]
             metrics.append({
                 'Train_R2': train_r2,
@@ -208,12 +257,22 @@ class AssetSelectioByModel:
         self.df = None
 
     def preprocess_data(self):
+        """
+        Pre-processes the data by computing its difference and filtering based on the specified start and end dates.
+        """
         new_data = self.data.diff(5)
         new_data = new_data.dropna(axis=0)
         self.df = new_data[(new_data.index >= self.start_date)
                            & (new_data.index < self.end_date)]
+        return
 
     def train_and_evaluate(self):
+        """
+        Trains the specified model on pre-processed data and evaluates its performance.
+
+        Returns:
+            DataFrame: A DataFrame sorted by descending performance score, containing results for each asset.
+        """
         if self.df is None:
             self.preprocess_data()
 
