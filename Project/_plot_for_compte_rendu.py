@@ -1,3 +1,8 @@
+# This file is simply the notebook in Python format. The reason for this is because I encounter bugs
+# with the display of graphs for the strategies in Jupyter Notebook—the graphs disappear over time.
+# Exporting it in this format allows all graphs to be opened in a web browser, avoiding this issue.
+
+
 import pandas as pd
 import numpy as np
 import warnings
