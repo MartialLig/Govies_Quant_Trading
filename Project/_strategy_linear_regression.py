@@ -120,7 +120,8 @@ class StrategyLinearRegression:
         self.index_all = index_all
         self.stop_loss = stop_loss
         self.z_score_transformation = z_score_transformation
-
+        # print(self.data_train.index.min(), self.data_train.index.max(),
+        #      self.data_trade.index.min(), self.data_trade.index.max())
         return
 
     def train(self):
